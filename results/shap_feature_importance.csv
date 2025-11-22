@@ -1,0 +1,26 @@
+feature,importance
+A (LMH/atm),4.8462524
+P Difference (atm),2.7051387
+Membrane AL Type_TFC,1.1718134
+DS Osmotic pressure (atm),0.9805045
+Membrane Direction_AL-FS,0.9622972
+Concentration_Ratio,0.9540704
+Osmotic_Pressure_Diff,0.7774469
+DS Molarity (M),0.3835541
+Flow Orientation (counter/ cocurrent)_counter,0.25910413
+Manufacture_encoded,0.23159038
+Osmotic_Per_Molarity,0.22352435
+FS Osmotic pressure (atm),0.18773782
+Membrane AL Type_TFN,0.1857382
+FS Temperature (°C),0.16199508
+FS Velocity (cm/s),0.15649982
+Temperature_Avg,0.11024112
+FS Molarity (M),0.091057494
+DS Temperature (°C),0.08425672
+DS Molecular weight,0.06788516
+DS Velocity (cm/s),0.06587583
+Draw Solution (DS)_encoded,0.030419612
+Temperature_Diff,0.029670492
+Velocity_Ratio,0.027785553
+Feed Solution (FS)_encoded,0.027465368
+MW_Normalized,0.0
