@@ -22,6 +22,7 @@ class FeatureEngineer:
     def __init__(self):
         self.scaler = None
         self.label_encoders = {}
+        self.onehot_columns = {}
         self.feature_names = None
         self.categorical_cols = []
         self.numerical_cols = []
@@ -100,10 +101,27 @@ class FeatureEngineer:
             'Flow Orientation (counter/ cocurrent)'
         ]
         
-        # One-hot encode
+        # Keep the training columns and reference category for every batch.
+        if fit:
+            self.onehot_columns = {}
         for col in onehot_cols:
             if col in df.columns:
-                dummies = pd.get_dummies(df[col], prefix=col, drop_first=True)
+                dummies = pd.get_dummies(df[col], prefix=col, drop_first=fit)
+                if fit:
+                    self.onehot_columns[col] = dummies.columns.tolist()
+                else:
+                    columns = getattr(self, 'onehot_columns', {}).get(col)
+                    if columns is None and self.feature_names is not None:
+                        # Pipelines saved before onehot_columns stored this schema
+                        # in the complete feature list instead.
+                        columns = [name for name in self.feature_names
+                                   if name.startswith(f'{col}_')]
+                    if columns is None:
+                        raise ValueError("Categorical encoder not fitted. Call with fit=True first.")
+                    # Missing and unseen categories contribute no active indicators.
+                    dummies = dummies.reindex(
+                        columns=columns, fill_value=False
+                    )
                 df = pd.concat([df, dummies], axis=1)
                 df = df.drop(columns=[col])
         
