@@ -190,7 +190,7 @@ class FeatureEngineer:
         else:
             if self.scaler is None:
                 raise ValueError("Scaler not fitted. Call with fit=True first.")
-            features[numerical_cols] = self.scaler.transform(features[numerical_cols])
+            features[self.numerical_cols] = self.scaler.transform(features[self.numerical_cols])
         
         # Recombine with target
         if target is not None:
@@ -258,6 +258,11 @@ class FeatureEngineer:
         
         # Step 3: Scale numerical features
         df = self.scale_features(df, target_col=target_col, fit=False)
+
+        # Model inputs must retain the fitted schema even when callers reorder columns.
+        if self.feature_names is not None:
+            columns = self.feature_names + ([target_col] if target_col in df.columns else [])
+            df = df.loc[:, columns]
         
         return df
     

@@ -40,6 +40,36 @@ def training_data():
 
 
 class FeatureEngineeringTests(unittest.TestCase):
+    def test_scaler_uses_fitted_numeric_column_order(self):
+        engineer = FeatureEngineer()
+        raw = pd.DataFrame({'first': [1.0, 3.0, 5.0], 'second': [10.0, 20.0, 30.0],
+                            TARGET: [5.0, 10.0, 15.0]})
+        trained = engineer.scale_features(raw)
+        actual = engineer.scale_features(raw[['second', TARGET, 'first']], fit=False)
+        assert_frame_equal(actual[trained.columns], trained)
+
+    def test_reordered_input_preserves_feature_order_and_model_predictions(self):
+        engineer = FeatureEngineer()
+        raw = training_data()
+        trained = engineer.fit_transform(raw)
+        model = LinearRegression().fit(trained.drop(columns=TARGET), raw[TARGET])
+        actual = engineer.transform(raw[raw.columns[::-1]])
+        assert_frame_equal(actual, trained)
+        np.testing.assert_allclose(model.predict(actual.drop(columns=TARGET)),
+                                   model.predict(trained.drop(columns=TARGET)))
+
+    def test_saved_pipeline_accepts_reordered_prediction_columns_without_target(self):
+        engineer = FeatureEngineer()
+        raw = training_data()
+        trained = engineer.fit_transform(raw)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'engineer.pkl'
+            engineer.save(path)
+            loaded = FeatureEngineer.load(path)
+            prediction = raw.iloc[[1]].drop(columns=TARGET)
+            actual = loaded.transform(prediction[prediction.columns[::-1]])
+            assert_frame_equal(actual, trained.iloc[[1]].drop(columns=TARGET))
+
     def test_single_rows_match_training_encoding_and_predictions(self):
         raw = training_data()
         engineer = FeatureEngineer()
